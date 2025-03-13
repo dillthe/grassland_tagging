@@ -35,40 +35,38 @@ public class OpenKoreanTextService {
     // 필터링할 단어 리스트
     List<String> filterWords = Arrays.asList("대한", "지금", "아니면", "이제", "거", "내", "로만", "것", "이런", "저런", "어떤", "종종", "과연", "나", "오늘", "그" );
 
-    public List<String> extractNouns(QuestionBody questionBody) {
+    public Set<String> extractNouns(QuestionBody questionBody) {
+        // 텍스트를 토큰화
+        Seq<KoreanTokenizer.KoreanToken> tokens = OpenKoreanTextProcessorJava.tokenize(questionBody.getQuestion());
 
-    // 텍스트를 토큰화합니다.
-    Seq<KoreanTokenizer.KoreanToken> tokens = OpenKoreanTextProcessorJava.tokenize(questionBody.getQuestion());
+        // 명사(Noun)만 필터링하여 Set으로 저장 (중복 제거됨)
+        Set<String> filteredNouns = JavaConverters.seqAsJavaList(tokens).stream()
+                .filter(token -> token.pos().equals(KoreanPos.Noun()))  // 명사만 필터링
+                .map(KoreanTokenizer.KoreanToken::text)
+                .collect(Collectors.toSet());  // Set으로 변환하여 중복 제거
 
-    // 토큰 중에서 명사만 필터링하여 리스트로 반환
-    Set<String> filteredNouns = JavaConverters.seqAsJavaList(tokens).stream()
-            .filter(token -> token.pos().equals(KoreanPos.Noun()))  // 명사(Noun)만 필터링
-            .map(KoreanTokenizer.KoreanToken::text)
-            .collect(Collectors.toSet());  // 중복 제거
+        log.info("filteredNouns: " + filteredNouns);
 
-    log.info("filteredPhrases" + filteredNouns);  // 필터링된 명사 리스트 확인
+        // 필터링한 구문들 중에서 추가 필터링
+        Set<String> result = filteredNouns.stream()
+                .filter(noun -> filterWords.stream().noneMatch(noun::contains)) // 필터 리스트에 포함되지 않은 단어만 남김
+                .collect(Collectors.toSet());
 
-    // 필터링한 구문들 중에서 추가 필터링
-    List<String> result = filteredNouns.stream()
-            .filter(noun -> filterWords.stream().noneMatch(noun::contains)) // 필터리스트의 단어가 포함되지 않은 경우만
-            .collect(Collectors.toList());
+        log.info("result after filtering: " + result);
 
-    log.info("result" + result);  // 필터링된 결과
+        // 짧은 구문이 긴 구문에 포함되는 경우 긴 구문만 남기도록 필터링
+        Set<String> finalResult = result.stream()
+                .filter(noun -> result.stream().noneMatch(other -> other.contains(noun) && !other.equals(noun)))
+                .collect(Collectors.toSet());
 
-    // 짧은 구문이 긴 구문에 포함되는 경우 긴 구문만 남기도록 필터링
-    List<String> finalResult = result;
-    result = result.stream()
-            .filter(noun -> finalResult.stream().noneMatch(other -> other.contains(noun) && !other.equals(noun)))
-            .collect(Collectors.toList());
-
-    return result;
+        return finalResult;
     }
 
 
-    public List<String> extractPhrases(QuestionBody questionBody) {
+    public Set<String> extractPhrases(QuestionBody questionBody) {
         Seq<KoreanTokenizer.KoreanToken> tokens = OpenKoreanTextProcessorJava.tokenize(questionBody.getQuestion());
 
-        List<KoreanPhraseExtractor.KoreanPhrase> phrases = OpenKoreanTextProcessorJava.extractPhrases(tokens, true, true);
+        Set<KoreanPhraseExtractor.KoreanPhrase> phrases = new HashSet<>(OpenKoreanTextProcessorJava.extractPhrases(tokens, true, true));
         log.info("tokens:" + tokens);
         log.info("phrases:" + phrases);
 
@@ -98,13 +96,13 @@ public class OpenKoreanTextService {
 //        log.info("combinedFiltered: " + combinedFiltered);
 
 
-        List<String> result = new ArrayList<>(filteredPhrases);
+        Set<String> result = new HashSet<>(filteredPhrases);
         log.info("result" + result);
         // 짧은 구문이 긴 구문에 포함되는 경우 긴 구문만 남기도록 필터링
-        List<String> finalResult = result;
+        Set<String> finalResult = result;
         result = result.stream()
                 .filter(phrase -> finalResult.stream().noneMatch(other -> other.contains(phrase) && !other.equals(phrase)))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
         return result;
     }

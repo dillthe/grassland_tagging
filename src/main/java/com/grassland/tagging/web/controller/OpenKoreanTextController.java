@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,12 +28,12 @@ public class OpenKoreanTextController {
     }
 
     @GetMapping("/extract-nouns")
-    public List<String> extractTokens(@RequestBody QuestionBody questionBody) {
+    public Set<String> extractTokens(@RequestBody QuestionBody questionBody) {
         return openKoreanTextService.extractNouns(questionBody);
     }
 
     @GetMapping("/extract-phrases")
-    public List<String> extractPhrases(@RequestBody QuestionBody questionBody) {
+    public Set<String> extractPhrases(@RequestBody QuestionBody questionBody) {
         return openKoreanTextService.extractPhrases(questionBody);
     }
 

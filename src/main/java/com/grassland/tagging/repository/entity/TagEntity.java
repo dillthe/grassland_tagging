@@ -24,7 +24,7 @@ public class TagEntity {
     private int tagId;
 
     @Size(max = 255, message = "태그 길이는 255자를 넘을 수 없습니다.")
-    @Column(name = "tag", nullable = false)
+    @Column(name = "tag_name", nullable = false)
     private String tag;
 
     @JsonBackReference

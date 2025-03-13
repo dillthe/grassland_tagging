@@ -18,7 +18,7 @@ public class TagController {
     @PostMapping
     public String createTag(@RequestBody TagBody tagBody){
         String tag = tagService.createTag(tagBody);
-        return "New tag:" + tag + "is created";
+        return "New tag: [" + tag + "] is created";
     }
 
     // 태그 조회 (질문에 포함된 태그들 조회)
