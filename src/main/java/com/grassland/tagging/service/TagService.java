@@ -55,16 +55,11 @@ public class TagService {
             tagRepository.saveAll(newTagEntities);
         }
 
-        // 기존 태그와 새로운 태그들을 합쳐서 반환하는 방법
-        Set<String> allTags = new HashSet<>(existingTags); // 기존 태그를 Set에 복사
-        allTags.addAll(newTags); // 새로운 태그 추가
-
-// 결과를 List로 반환하려면
-        List<String> result = new ArrayList<>(allTags); // Set을 List로 변환 후 반환
-        return result;
-        //        return savedTags.stream()
-//                .map(TagEntity::getTag)
-//                .collect(Collectors.toList());
+        if (newTagEntities.isEmpty()) {
+            return Collections.singletonList("All tags are already registered. No new tags were created.");
+        } else {
+            return newTagEntities.stream().map(TagEntity::getTag).toList();
+        }
     }
 
     //질문과 연관된 전체 태그 반환

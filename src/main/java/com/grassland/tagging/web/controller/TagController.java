@@ -27,7 +27,7 @@ public class TagController {
     @PostMapping("/batch")
     public String createTags(@RequestBody List<TagBody> tagBodies){
         List<String> tagList = tagService.createTags(tagBodies);
-        return "New tags: [" + tagList + "] are created";
+        return "Tags are successfully added" + tagList;
     }
 
 
