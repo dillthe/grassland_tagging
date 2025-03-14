@@ -41,23 +41,20 @@ public class QuestionService {
 
         for (String tag : tagList) {
             String trimmedTag = (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim();
-//            TagEntity tagEntity = tagRepository.findByTag(trimmedTag).orElse(null);
-            if ("기타".equals(trimmedTag)) {
-                // "기타" 태그는 이미 있는지 확인하여 없으면 새로 생성
-                TagEntity tagEntity = tagRepository.findByTag("기타").orElse(null);
+            // 기존 태그 검색
+            TagEntity tagEntity = tagRepository.findByTag(trimmedTag).orElse(null);
+
+            // 태그가 없으면 "기타" 태그로 대체
+            if (tagEntity == null) {
+                tagEntity = tagRepository.findByTag("기타").orElse(null);
+
+                // "기타" 태그가 없으면 새로 생성
                 if (tagEntity == null) {
                     tagEntity = new TagEntity();
                     tagEntity.setTag("기타");
-                    tagEntity = tagRepository.save(tagEntity);  // 새 "기타" 태그 저장
+                    tagEntity = tagRepository.save(tagEntity);
                 }
-            } else {
-                TagEntity tagEntity = tagRepository.findByTag(trimmedTag)
-                        .orElseGet(() -> {
-                            TagEntity newTag = new TagEntity();
-                            newTag.setTag(trimmedTag.replaceAll(" ", ""));
-                            return tagRepository.save(newTag);
-                        });
-
+            }
                 if (tagEntity != null) {
                     questionEntity.getTags().add(tagEntity);
                     logger.info("Tag assigned. Tag: " + tagEntity);
@@ -65,13 +62,14 @@ public class QuestionService {
                 tagEntities.add(tagEntity);
                 tagEntity.getQuestions().add(questionEntity);
             }
-        }    questionEntity.setTags(tagEntities);
+            questionEntity.setTags(tagEntities);
             QuestionEntity savedQuestion = questionRepository.save(questionEntity);
             QuestionDTO questionDTO = QuestionMapper.INSTANCE.questionEntityToQuestionDTO(savedQuestion);
 
 
 
-        return String.format("Question is created: %s, Tags: %s",
+        return String.format("Question is created: Q.ID:%s, %s, Tags: %s",
+                questionDTO.getQuestionId(),
                 questionDTO.getQuestion(),
                 String.join(", ", questionDTO.getTags()));
     }

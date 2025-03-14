@@ -15,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,21 +38,34 @@ public class TagService {
         return tagCreated.getTag();
     }
 
-//    public List<String> createTags(List<TagBody> tagBodies) {
-//        for (TagBody tagBody : tagBodies) {
-//            if (tagRepository.existsByTag(tagBody.getTag())) {
-//                throw new NotAcceptException("Tag with the same name already exists: " + tagBody.getName());
-//            }
-//        }
-//        List<TagEntity> tagEntities = tagBodies.stream()
-//                .map(tagBody -> TagMapper.INSTANCE.idAndTagBodyToTagEntity(null, tagBody))
-//                .collect(Collectors.toList());
-//        List<TagEntity> savedCategories = tagRepository.saveAll(tagEntities);
-//
-//        return savedCategories.stream()
+    public List<String> createTags(List<TagBody> tagBodies) {
+      // 이미 존재하는 태그 목록 가져오기
+        Set<String> existingTags = tagRepository.findByTagIn(
+                tagBodies.stream().map(TagBody::getTag).collect(Collectors.toSet())
+                //tagBodies에서 각각의 태그 문자열을 얻기, 얻어서 tagRepository의 FindByTagIn을 통해 태그를 가진 tagEntitySet을 찾음
+        ).stream().map(TagEntity::getTag).collect(Collectors.toSet());//반환한 값 결과가 Set<TagEntity>이니깐
+
+        Set<TagEntity> newTagEntities = tagBodies.stream()
+                .filter(tagBody -> !existingTags.contains(tagBody.getTag()))
+                .map(tagBody -> TagMapper.INSTANCE.idAndTagBodyToTagEntity(null, tagBody))
+                .collect(Collectors.toSet());
+
+        //새로운 태그가 있을 경우에만 저장!
+        if (!newTagEntities.isEmpty()) {
+            tagRepository.saveAll(newTagEntities);
+        }
+
+        // 기존 태그와 새로운 태그들을 합쳐서 반환하는 방법
+        Set<String> allTags = new HashSet<>(existingTags); // 기존 태그를 Set에 복사
+        allTags.addAll(newTags); // 새로운 태그 추가
+
+// 결과를 List로 반환하려면
+        List<String> result = new ArrayList<>(allTags); // Set을 List로 변환 후 반환
+        return result;
+        //        return savedTags.stream()
 //                .map(TagEntity::getTag)
 //                .collect(Collectors.toList());
-//    }
+    }
 
     //질문과 연관된 전체 태그 반환
     public String getTagsByQuestionId(int questionId) {

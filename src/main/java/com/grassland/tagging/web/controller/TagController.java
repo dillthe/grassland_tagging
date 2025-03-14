@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/tag")
@@ -20,6 +22,14 @@ public class TagController {
         String tag = tagService.createTag(tagBody);
         return "New tag: [" + tag + "] is created";
     }
+
+    @Operation(summary="Create many tags")
+    @PostMapping("/batch")
+    public String createTags(@RequestBody List<TagBody> tagBodies){
+        List<String> tagList = tagService.createTags(tagBodies);
+        return "New tags: [" + tagList + "] are created";
+    }
+
 
     // 태그 조회 (질문에 포함된 태그들 조회)
     @Operation(summary = "Get Tags by Question ID")
