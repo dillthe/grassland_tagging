@@ -36,7 +36,8 @@ public class QuestionService {
     @Transactional
     public String createQuestion(QuestionBody questionBody) {
         QuestionEntity questionEntity = QuestionMapper.INSTANCE.idAndQuestionBodyToQuestionEntity(null, questionBody);
-        Set<String> tagList = oktService.extractPhrases(questionBody);
+//        Set<String> tagList = oktService.extractPhrases(questionBody);
+        Set<String> tagList = oktService.extractNouns(questionBody);
         Set<TagEntity> tagEntities = new HashSet<>();
 
         for (String tag : tagList) {
@@ -89,16 +90,6 @@ public class QuestionService {
         List<QuestionDTO> questionDTOs = QuestionMapper.INSTANCE.questionEntitiesToQuestionDTOs(questionEntities);
         return questionDTOs;
     }
-
-//    //카테고리별 전체 질문 조회
-//    public List<QuestionDTO> getAllQuestionsByTag(int tagId) {
-//        TagEntity tagEntity = tagRepository.findById(tagId)
-//                .orElseThrow(() -> new NotFoundException("Tag with ID " + tagId + " not found"));
-//
-//        List<QuestionEntity> questionEntities = questionRepository.findByTagEntity(tagEntity);
-//        List<QuestionDTO> questionDTOs = QuestionMapper.INSTANCE.questionEntitiesToQuestionDTOs(questionEntities);
-//        return questionDTOs;
-//    }
 
 //    질문 단건 조회
     public QuestionDTO getQuestionById(int questionId) {

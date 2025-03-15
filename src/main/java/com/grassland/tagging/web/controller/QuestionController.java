@@ -36,12 +36,6 @@ public class QuestionController {
         return questionService.getAllQuestions();
     }
 
-//    @Operation(summary = "Get all questions by category")
-//    @GetMapping("/category/{categoryId}")
-//    public List<QuestionDTO> getAllQuestionsByCategory(@PathVariable int categoryId) {
-//        return questionService.getAllQuestionsByCategory(categoryId);
-//    }
-
     @Operation(summary = "Get one question by Id")
     @GetMapping("/{questionId}")
     public QuestionDTO getQuestion(@PathVariable int questionId) {
