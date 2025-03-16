@@ -1,6 +1,7 @@
 package com.grassland.tagging.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -27,13 +29,19 @@ public class TagEntity {
     @Column(name = "tag_name", nullable = false)
     private String tag;
 
+    // 양방향 관계에서 반대편을 지정 (하위태그를 가진 필드)
     @JsonBackReference
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
-            name = "question_tag", // 중간 테이블 이름
-            joinColumns = @JoinColumn(name = "tag_id"),  // TagEntity에서 참조하는 컬럼
-            inverseJoinColumns = @JoinColumn(name = "question_id") // QuestionEntity에서 참조하는 컬럼
+            name = "tag_subtag",  // 중간 테이블 이름
+            joinColumns = @JoinColumn(name = "tag_id"), // 상위태그(주체)의 외래키
+            inverseJoinColumns = @JoinColumn(name = "sub_tag_id")  // 하위태그의 외래키
     )
+    private List<SubTagEntity> subTagEntities;
+
+
+    @JsonBackReference  // 순환 참조 방지
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")  // mappedBy로 관계 주도
     private Set<QuestionEntity> questions = new HashSet<>();
 
 }

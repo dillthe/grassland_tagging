@@ -23,12 +23,13 @@ public class OpenKoreanTextService {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenKoreanTextService.class);
 
-    public String normalizeText(String text) {
-        return OpenKoreanTextProcessorJava.normalize(text).toString();
+    public String normalizeText(QuestionBody questionBody) {
+        return OpenKoreanTextProcessorJava.normalize(questionBody.getQuestion()).toString();
     }
 
-    public List<String> tokenizeText(String text) {
-        Seq<KoreanTokenizer.KoreanToken> tokens = OpenKoreanTextProcessorJava.tokenize(text);
+    public List<String> tokenizeText(QuestionBody questionBody) {
+        Seq<KoreanTokenizer.KoreanToken> tokens = OpenKoreanTextProcessorJava.tokenize(questionBody.getQuestion());
+        log.info("tokens: " + tokens);
         return OpenKoreanTextProcessorJava.tokensToJavaStringList(tokens);
     }
 

@@ -18,13 +18,13 @@ public class OpenKoreanTextController {
 
 
     @GetMapping("/normalize")
-    public String normalize(@RequestParam String text) {
-        return openKoreanTextService.normalizeText(text);
+    public String normalize(@RequestBody QuestionBody questionBody) {
+        return openKoreanTextService.normalizeText(questionBody);
     }
 
     @GetMapping("/tokenize")
-    public List<String> tokenize(@RequestParam String text) {
-        return openKoreanTextService.tokenizeText(text);
+    public List<String> tokenize(@RequestBody QuestionBody questionBody) {
+        return openKoreanTextService.tokenizeText(questionBody);
     }
 
     @GetMapping("/extract-nouns")

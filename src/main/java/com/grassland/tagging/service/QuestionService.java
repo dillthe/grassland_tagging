@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -36,30 +38,62 @@ public class QuestionService {
     @Transactional
     public String createQuestion(QuestionBody questionBody) {
         QuestionEntity questionEntity = QuestionMapper.INSTANCE.idAndQuestionBodyToQuestionEntity(null, questionBody);
+
+        List<String> tagList = oktService.tokenizeText(questionBody);
 //        Set<String> tagList = oktService.extractPhrases(questionBody);
-        Set<String> tagList = oktService.extractNouns(questionBody);
+//        Set<String> tagList = oktService.extractNouns(questionBody);
+        //토큰화를 해서
         Set<TagEntity> tagEntities = new HashSet<>();
 
-        for (String tag : tagList) {
-            String trimmedTag = (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim();
-            // 기존 태그 검색
-            TagEntity tagEntity = tagRepository.findByTag(trimmedTag).orElse(null);
+//        List<TagEntity> allTags = tagRepository.findAll(); // 모든 태그 가져오기
+//        Set<String> validTags = allTags.stream()
+//                .flatMap(tag -> Stream.concat(Stream.of(tag.getTag())
+////                      ,  tag.getSubTags().stream().map(SubTagEntity::getSubTag)))
+//                .collect(Collectors.toSet());
 
-            // 태그가 없으면 "기타" 태그로 대체
+        // 1. 모든 상위 태그를 가져와 Set으로 변환
+        Set<String> validTags = tagRepository.findAll()
+                .stream()
+                .map(TagEntity::getTag) // 상위 태그 이름만 추출
+                .collect(Collectors.toSet());
+
+// 2. 토큰화된 태그 목록을 필터링하여 유효한 태그만 선택
+        List<String> matchedTags = tagList.stream()
+                .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim())
+                .filter(tag->validTags.stream().anyMatch(validTag -> tag.contains(validTag)))
+                .collect(Collectors.toList());
+        // 디버깅 로그 추가
+        logger.info("Matched tags: " + matchedTags);
+
+//        for (String tag : tagList) {
+//            String trimmedTag = (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim();
+//            // 기존 태그 검색
+        for(String tag:matchedTags){
+            TagEntity tagEntity = tagRepository.findAll()
+                    .stream()
+                    .filter(t -> tag.contains(t.getTag())) // 부분 문자열 포함 검사
+                    .findFirst()
+                    .orElse(null);
+
+            // 디버깅 로그
+            if (tagEntity != null) {
+                logger.info("Matched TagEntity: " + tagEntity.getTag());
+            } else {
+                logger.info("No matching TagEntity found for: " + tag);
+            }
+
+            // 태그가 없으면 "기타" 태그로 대체로 설정해놨는데
+            //AI에 보내서 태그를 출력하도록 하자?
             if (tagEntity == null) {
                 tagEntity = tagRepository.findByTag("기타").orElse(null);
-
-                // "기타" 태그가 없으면 새로 생성
-                if (tagEntity == null) {
-                    tagEntity = new TagEntity();
-                    tagEntity.setTag("기타");
-                    tagEntity = tagRepository.save(tagEntity);
-                }
+//                // "기타" 태그가 없으면 새로 생성
+//                if (tagEntity == null) {
+//                    tagEntity = new TagEntity();
+//                    tagEntity.setTag("기타");
+//                    tagEntity = tagRepository.save(tagEntity);
+//                }
             }
-                if (tagEntity != null) {
-                    questionEntity.getTags().add(tagEntity);
-                    logger.info("Tag assigned. Tag: " + tagEntity);
-                }
+            questionEntity.getTags().add(tagEntity);
                 tagEntities.add(tagEntity);
                 tagEntity.getQuestions().add(questionEntity);
             }

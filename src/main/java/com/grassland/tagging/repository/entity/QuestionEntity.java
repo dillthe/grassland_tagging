@@ -33,7 +33,11 @@ public class QuestionEntity {
     private Instant createdAt = Instant.now();
 
 
-    @JsonManagedReference
-    @ManyToMany(mappedBy = "questions")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "question_tag",  // 중간 테이블 이름
+            joinColumns = @JoinColumn(name = "question_id"),  // QuestionEntity에서 참조하는 컬럼
+            inverseJoinColumns = @JoinColumn(name = "tag_id")  // TagEntity에서 참조하는 컬럼
+    )
     private Set<TagEntity> tags = new HashSet<>();
 }
