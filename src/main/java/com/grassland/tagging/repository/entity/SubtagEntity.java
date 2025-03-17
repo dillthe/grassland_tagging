@@ -1,10 +1,10 @@
 package com.grassland.tagging.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -15,17 +15,17 @@ import java.util.List;
 @Entity
 @ToString
 @Table(name = "Subtag")
-public class SubTagEntity {
+public class SubtagEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "subtag_id")
-    private int subTagId;
+    private int subtagId;
 
-    @Column(name = "subtag")
-    private String subTag;
+    @Column(name = "subtag_name")
+    private String subtagName;
 
     @JsonManagedReference
-    @ManyToMany(mappedBy = "subTagEntities", fetch = FetchType.LAZY, cascade = CascadeType.ALL)  // 상위태그에서 정의한 필드명 사용
-    private List<TagEntity> tags;
+    @ManyToMany(mappedBy = "subtagEntities", fetch = FetchType.LAZY)
+    private List<TagEntity> tags = new ArrayList<>();
 }

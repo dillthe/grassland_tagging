@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,9 +36,9 @@ public class TagEntity {
     @JoinTable(
             name = "tag_subtag",  // 중간 테이블 이름
             joinColumns = @JoinColumn(name = "tag_id"), // 상위태그(주체)의 외래키
-            inverseJoinColumns = @JoinColumn(name = "sub_tag_id")  // 하위태그의 외래키
+            inverseJoinColumns = @JoinColumn(name = "subtag_id")  // 하위태그의 외래키
     )
-    private List<SubTagEntity> subTagEntities;
+    private List<SubtagEntity> subtagEntities = new ArrayList<>();
 
 
     @JsonBackReference  // 순환 참조 방지
