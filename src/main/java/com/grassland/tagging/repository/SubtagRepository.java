@@ -26,7 +26,9 @@ public interface SubtagRepository extends JpaRepository<SubtagEntity, Integer> {
     Optional<SubtagEntity> findBySubtagIdAndTags(int subtagId, TagEntity tag);
 
     // subtag 값이 특정 문자열과 일치하는 모든 SubtagEntity 조회
-    List<SubtagEntity> findBySubtagName(String firstMatchedSubtag);
+//    List<SubtagEntity> findBySubtagName(String firstMatchedSubtag);
+
+    Optional<SubtagEntity> findBySubtagName(String subtagName);
 }
 //
 //    List<SubtagEntity> findAllByTagEntity(TagEntity tagEntity);

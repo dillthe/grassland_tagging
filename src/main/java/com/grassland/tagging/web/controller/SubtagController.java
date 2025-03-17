@@ -17,6 +17,23 @@ public class SubtagController {
 
     private final SubtagService subtagService;
 
+    @Operation(summary="Add a Subtag to Tag")
+    @PostMapping("/tag/{tagId}/subtag")
+    public String createSubtag(@PathVariable int tagId, @RequestBody SubtagBody subtagBody) {
+        SubtagDTO subtagDTO = subtagService.createSubtag(tagId, subtagBody);
+        return subtagDTO + "is successfully added!";
+    }
+
+    //서브태그가 포함된 전체 태그 조회
+    //상위태그-하위태그 다대다 관계로 동일한 하위태그가 여러 상위태그에 포함될 수 있음.
+    //하위태그와 이게 포함된 상위태그가 함께 출력되어 한눈에 중복된 데이터를 조회 가능
+    // 아래 delete a subtag by subtag 메소드 사용하면 삭제 가능
+    @Operation(summary="Find subtags and their Tags(find duplicate subtags")
+    @GetMapping("/subtag/find")
+    public String findSubtag(@RequestBody SubtagBody subtagBody) {
+        return subtagService.findSubtag(subtagBody);
+    }
+
     @Operation(summary="Get all subtags")
     @GetMapping("/subtag")
     public List<SubtagDTO> getAllSubtags() {
@@ -30,12 +47,7 @@ public class SubtagController {
         return  subtagService.getSubtagsByTagId(tagId);
     }
 
-    @Operation(summary="Add a Subtag to Tag")
-    @PostMapping("/tag/{tagId}/subtag")
-    public String createSubtag(@PathVariable int tagId, @RequestBody SubtagBody subtagBody) {
-        SubtagDTO subtagDTO = subtagService.createSubtag(tagId, subtagBody);
-        return subtagDTO + "is successfully added!";
-    }
+
 
     @Operation(summary="Add many subtags")
     @PostMapping("/tag/{tagId}/subtag/batch")
@@ -44,15 +56,7 @@ public class SubtagController {
         return "Subtags are added successfully!" + subtagDTOs.toString();
     }
 
-    //서브태그가 포함된 전체 태그 조회
-    //상위태그-하위태그 다대다 관계로 동일한 하위태그가 여러 상위태그에 포함될 수 있음.
-    //하위태그와 이게 포함된 상위태그가 함께 출력되어 한눈에 중복된 데이터를 조회 가능
-    // 아래 delete a subtag by subtag 메소드 사용하면 삭제 가능
-    @Operation(summary="Find subtags and their Tags(find duplicate subtags")
-    @GetMapping("/subtag/find")
-    public String findSubtags(@RequestBody SubtagBody subtagBody) {
-        return subtagService.findSubtag(subtagBody);
-    }
+
 
     // 하위태그 명으로 삭제
     @Operation(summary="Delete a Subtag by Subtag Id")
