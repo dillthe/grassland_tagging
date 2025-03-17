@@ -13,7 +13,7 @@ import java.util.List;
 public interface SubtagMapper {
     SubtagMapper INSTANCE = Mappers.getMapper(SubtagMapper.class);
     @Mapping(target = "subtagName", source = "subtagBody.subtagName")
-    SubtagEntity idAndSubtagBodyToSubtagEntity(Integer subtagId, SubtagBody subtagBody);
+    SubtagEntity idAndSubtagBodyToSubtagEntity(Integer id, SubtagBody subtagBody);
 
     SubtagDTO subtagEntityToSubtagDTO(SubtagEntity subtagEntity);
     List<SubtagDTO> subtagEntitiesToSubtagDTOs(List<SubtagEntity> subtagEntities);

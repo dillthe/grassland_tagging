@@ -2,13 +2,18 @@ package com.grassland.tagging.service;
 
 import com.grassland.tagging.repository.SubtagRepository;
 import com.grassland.tagging.repository.TagRepository;
+import com.grassland.tagging.repository.entity.QuestionEntity;
 import com.grassland.tagging.repository.entity.SubtagEntity;
 import com.grassland.tagging.repository.entity.TagEntity;
 import com.grassland.tagging.service.exceptions.NotAcceptException;
 import com.grassland.tagging.service.exceptions.NotFoundException;
+import com.grassland.tagging.service.mapper.QuestionMapper;
 import com.grassland.tagging.service.mapper.SubtagMapper;
+import com.grassland.tagging.service.mapper.TagMapper;
+import com.grassland.tagging.web.dto.QuestionDTO;
 import com.grassland.tagging.web.dto.SubtagBody;
 import com.grassland.tagging.web.dto.SubtagDTO;
+import com.grassland.tagging.web.dto.TagBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -16,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,23 +55,61 @@ public class SubtagService {
 
     // 키워드 추가
     public SubtagDTO createSubtag(int tagId, SubtagBody subtagBody) {
+//            boolean subtagExists = tagRepository.existsByTag(subtagBody.getSubtagName());
+//            if (subtagExists) {
+//                throw new NotAcceptException("Subtag with the same name: " + subtagBody.getSubtagName() + " already exists.");
+//            }
+//
+//            TagEntity tagEntity = TagMapper.INSTANCE.idAndTagBodyToTagEntity(null, tagBody);
+//            log.info(tagEntity.toString());
+//            TagEntity tagCreated = tagRepository.save(tagEntity);
+//            return "ID:"+ tagCreated.getTagId() + " "+tagCreated.getTag();
+//        }
+//
+
         TagEntity tagEntity = tagRepository.findById(tagId)
                 .orElseThrow(() -> new NotFoundException("Tag with ID " + tagId + " not found"));
-
-        for (SubtagEntity subtag : tagEntity.getSubtagEntities()) {
-            if (subtag.getSubtagName().equals(subtagBody.getSubtagName())) {
-                throw new NotAcceptException("Subtag: " + subtagBody.getSubtagName() + " is already added.");
-            }
-        }
+        log.info("Found tagEntity: {}{}", tagEntity.getTag(), tagEntity.getTagId());
 
         SubtagEntity subtagEntity = SubtagMapper.INSTANCE.idAndSubtagBodyToSubtagEntity(null, subtagBody);
-        // 3. Tag와 SubTag 연결 (다대다 관계)
-        tagEntity.getSubtagEntities().add(subtagEntity); // TagEntity에 SubTagEntity 추가
+        log.info("Created subtagEntity: {},{}", subtagEntity.getSubtagId(),subtagEntity.getSubtagName());
+
         subtagEntity.getTags().add(tagEntity);
+        log.info("SubtagEntity with tags: {}", subtagEntity.getTags().toString());  // SubtagEntity에 추가된 tags 확인
+
+        tagEntity.getSubtagEntities().add(subtagEntity);
+        log.info("TagEntity with subtags: {}", tagEntity.getSubtagEntities().toString());  // TagEntity에 추가된 subtags 확인
+
         SubtagEntity savedSubtag = subtagRepository.save(subtagEntity);
+        log.info("Saved subtagEntity: {},{}", savedSubtag.getSubtagId(), savedSubtag.getSubtagName());  // 저장된 SubtagEntity 확인
+
         SubtagDTO subtagDTO = SubtagMapper.INSTANCE.subtagEntityToSubtagDTO(savedSubtag);
         return subtagDTO;
     }
+//
+//        TagEntity tagEntity = tagRepository.findById(tagId)
+//                .orElseThrow(() -> new NotFoundException("Tag with ID " + tagId + " not found"));
+//
+//        // 빈 리스트가 아니라면, 초기화가 제대로 되어있을 것입니다.
+//        if (tagEntity.getSubtagEntities() == null) {
+//            tagEntity.setSubtagEntities(new ArrayList<>());
+//        }
+//
+//        for (SubtagEntity subtag : tagEntity.getSubtagEntities()) {
+//            if (subtag.getSubtagName().equals(subtagBody.getSubtagName())) {
+//                throw new NotAcceptException("Subtag: " + subtagBody.getSubtagName() + " is already added.");
+//            }
+//        }
+//
+//        SubtagEntity subtagEntity = SubtagMapper.INSTANCE.idAndSubtagBodyToSubtagEntity(null, subtagBody);
+//
+//        // 3. Tag와 SubTag 연결 (다대다 관계)
+//        tagEntity.getSubtagEntities().add(subtagEntity); // TagEntity에 SubTagEntity 추가
+//        subtagEntity.getTags().add(tagEntity);
+//        SubtagEntity savedSubtag = subtagRepository.save(subtagEntity);
+//        SubtagDTO subtagDTO = SubtagMapper.INSTANCE.subtagEntityToSubtagDTO(savedSubtag);
+//        return subtagDTO;
+//    }
 
 
 

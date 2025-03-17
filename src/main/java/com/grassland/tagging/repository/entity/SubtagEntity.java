@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Getter
@@ -13,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@ToString
 @Table(name = "Subtag")
 public class SubtagEntity {
 
@@ -25,7 +26,19 @@ public class SubtagEntity {
     @Column(name = "subtag_name")
     private String subtagName;
 
-    @JsonManagedReference
-    @ManyToMany(mappedBy = "subtagEntities", fetch = FetchType.LAZY)
-    private List<TagEntity> tags = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "tag_subtag", // 중간 테이블 이름
+            joinColumns = @JoinColumn(name = "subtag_id"), // 서브태그 외래키
+            inverseJoinColumns = @JoinColumn(name = "tag_id") // 태그 외래키
+    )
+    private Set<TagEntity> tags = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "SubtagEntity{" +
+                "subtagId=" + subtagId +
+                ", subtagName='" + subtagName + '\'' +
+                '}';
+    }
 }

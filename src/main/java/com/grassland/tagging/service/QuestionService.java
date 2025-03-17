@@ -65,9 +65,6 @@ public class QuestionService {
         // 디버깅 로그 추가
         logger.info("Matched tags: " + matchedTags);
 
-//        for (String tag : tagList) {
-//            String trimmedTag = (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim();
-//            // 기존 태그 검색
         for(String tag:matchedTags){
             TagEntity tagEntity = tagRepository.findAll()
                     .stream()
@@ -83,7 +80,7 @@ public class QuestionService {
             }
 
             // 태그가 없으면 "기타" 태그로 대체로 설정해놨는데
-            //AI에 보내서 태그를 출력하도록 하자?
+            //AI에 보내서 태그를 출력하도록 하기>>>>>아직!!
             if (tagEntity == null) {
                 tagEntity = tagRepository.findByTag("기타").orElse(null);
 //                // "기타" 태그가 없으면 새로 생성

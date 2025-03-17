@@ -14,6 +14,9 @@ import java.util.List;
 public interface TagMapper {
     TagMapper INSTANCE = Mappers.getMapper(TagMapper.class);
 
+
+    TagEntity idAndTagBodyToTagEntity(Integer id, TagBody tagBody);
+
     @Mapping(target = "questionCount", expression = "java(tag.getQuestions().size())")
     TagDTO tagEntityToTagDTO(TagEntity tag);
 
@@ -23,5 +26,4 @@ public interface TagMapper {
         return tagEntity != null ? tagEntity.getTag() : null;
     }
 
-    TagEntity idAndTagBodyToTagEntity(Integer id, TagBody tagBody);
 }

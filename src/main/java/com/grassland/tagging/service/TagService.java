@@ -34,6 +34,7 @@ public class TagService {
         }
 
         TagEntity tagEntity = TagMapper.INSTANCE.idAndTagBodyToTagEntity(null, tagBody);
+        log.info(tagEntity.toString());
         TagEntity tagCreated = tagRepository.save(tagEntity);
         return "ID:"+ tagCreated.getTagId() + " "+tagCreated.getTag();
     }
