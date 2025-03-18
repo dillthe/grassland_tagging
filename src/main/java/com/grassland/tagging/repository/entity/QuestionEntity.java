@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -40,4 +42,12 @@ public class QuestionEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")  // TagEntity에서 참조하는 컬럼
     )
     private Set<TagEntity> tags = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "question_subtag",  // 중간 테이블 이름
+            joinColumns = @JoinColumn(name = "question_id"),  // QuestionEntity에서 참조하는 컬럼
+            inverseJoinColumns = @JoinColumn(name = "subtag_id")  // TagEntity에서 참조하는 컬럼
+    )
+    private List<SubtagEntity> subtags = new ArrayList<>();
 }

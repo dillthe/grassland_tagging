@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -52,74 +51,136 @@ public class QuestionService {
         Set<TagEntity> tagEntities = new HashSet<>();
         List<SubtagEntity> subtagEntities = new ArrayList<>();
 
-        //모든 상위 태그를 가져와 Set으로 변환
-        Set<String> validTags = tagRepository.findAll()
-                .stream()
-                .map(TagEntity::getTag) // 상위 태그 이름만 추출
-                .collect(Collectors.toSet());
-
         //모든 하위태그를 가져와서 List로 변환
         List<String> validSubtags = subtagRepository.findAll()
                 .stream()
                 .map(SubtagEntity::getSubtagName) //하위 태그 이름만 추출
                 .collect(Collectors.toList());
 
+        //하위태그가 포함된 태그를 필터링해서 matchedTag 생성
+        List<String> matchedTags = tagList.stream()
+                .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim())
+                .filter(tag -> validSubtags.stream().anyMatch(validSubtag -> tag.contains(validSubtag)))  // 하위 태그 체크
+                .collect(Collectors.toList());
+        logger.info("Matched tags: " + matchedTags);
 
-        //토큰화 된 태그 목록을 필터링하여 유효한 태그만 선택
+        // 2. matchedTags를 돌면서 해당하는 TagEntity를 추가
+        for (String subtag : matchedTags) {
+            SubtagEntity subtagEntity = findSubtagEntity(subtag);  // 태그에 해당하는 TagEntity 찾기
+
+            // 디버깅 로그
+            if (subtagEntity != null) {
+                logger.info("Matched TagEntity: " + subtagEntity.getTags());
+            } else {
+                logger.info("No matching TagEntity found for: " + subtag);
+            }
+
+            // 태그가 없으면 "기타" 태그로 대체
+            if (subtagEntity == null) {
+                subtagEntity = subtagRepository.findBySubtagName("기타").orElseGet(() -> createOtherSubtag());  // "기타" 태그 없으면 새로 생성
+            }
+
+            // QuestionEntity에 태그 추가
+            questionEntity.getSubtags().add(subtagEntity);
+            subtagEntities.add(subtagEntity);
+            questionEntity.getTags().addAll(subtagEntity.getTags());
+            tagEntities.addAll(subtagEntity.getTags());
+            subtagEntity.getQuestions().add(questionEntity);
+        }
+
+        // QuestionEntity 저장
+        questionEntity.setTags(tagEntities);
+        questionEntity.setSubtags(subtagEntities);
+        QuestionEntity savedQuestion = questionRepository.save(questionEntity);
+        QuestionDTO questionDTO = QuestionMapper.INSTANCE.questionEntityToQuestionDTO(savedQuestion);
+
+        // 결과 반환
+        return String.format("Question is created: Q.ID:%s, %s, Tags: %s, Subtags: %s",
+                questionDTO.getQuestionId(),
+                questionDTO.getQuestion(),
+                questionDTO.getTags(),
+                questionDTO.getSubtag(),
+                String.join(", "));
+    }
+
+
+//        //모든 상위 태그를 가져와 Set으로 변환
+//        Set<String> validTags = tagRepository.findAll()
+//                .stream()
+//                .map(TagEntity::getTag) // 상위 태그 이름만 추출
+//                .collect(Collectors.toSet());
+
+
+    //토큰화 된 태그 목록을 필터링하여 유효한 태그만 선택
 //        List<String> matchedTags = tagList.stream()
 //                .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim())
 //                .filter(tag->validTags.stream().anyMatch(validTag -> tag.contains(validTag)))
 //                .collect(Collectors.toList());
 
-        //상위태그와 하위태그가 모두 포함된 태그를 필터링해서 matchedTag 생성
-        List<String> matchedTags = tagList.stream()
-                .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim()) // null이나 공백 제거
-                .filter(tag -> validTags.stream().anyMatch(validTag -> tag.contains(validTag))  // 상위 태그 체크
-                        || validSubtags.stream().anyMatch(validSubtag -> tag.contains(validSubtag)))  // 하위 태그 체크
-                .collect(Collectors.toList());
-        logger.info("Matched tags: " + matchedTags);
 
+//        for(String tag:matchedTags){
+//            TagEntity tagEntity = tagRepository.findAll()
+//                    .stream()
+//                    .filter(t -> tag.contains(t.getTag())) // 부분 문자열 포함 검사
+//                    .findFirst()
+//                    .orElse(null);
 
+//            // 디버깅 로그
+//            if (tagEntity != null) {
+//                logger.info("Matched TagEntity: " + tagEntity.getTag());
+//            } else {
+//                logger.info("No matching TagEntity found for: " + tag);
+//            }
+//
+//            // 태그가 없으면 "기타" 태그로 대체로 설정해놨는데
+//            //AI에 보내서 태그를 출력하도록 하기>>>>>아직!!
+//            if (tagEntity == null) {
+//                tagEntity = tagRepository.findByTag("기타").orElse(null);
+////                // "기타" 태그가 없으면 새로 생성
+////                if (tagEntity == null) {
+////                    tagEntity = new TagEntity();
+////                    tagEntity.setTag("기타");
+////                    tagEntity = tagRepository.save(tagEntity);
+////                }
+//            }
+//            questionEntity.getTags().add(tagEntity);
+//            tagEntities.add(tagEntity);
+//            tagEntity.getQuestions().add(questionEntity);
+//            }
+//            questionEntity.setTags(tagEntities);
+//            QuestionEntity savedQuestion = questionRepository.save(questionEntity);
+//            QuestionDTO questionDTO = QuestionMapper.INSTANCE.questionEntityToQuestionDTO(savedQuestion);
+//
+//
+//
+//        return String.format("Question is created: Q.ID:%s, %s, Tags: %s",
+//                questionDTO.getQuestionId(),
+//                questionDTO.getQuestion(),
+//                String.join(", ", questionDTO.getTags()));
+//    }
 
-        for(String tag:matchedTags){
-            TagEntity tagEntity = tagRepository.findAll()
-                    .stream()
-                    .filter(t -> tag.contains(t.getTag())) // 부분 문자열 포함 검사
-                    .findFirst()
-                    .orElse(null);
+    private SubtagEntity findSubtagEntity(String text) {
+        // 하위 태그에서 찾기
+        SubtagEntity subtagEntity = subtagRepository.findAll()
+                .stream()
+                .filter(s -> text.contains(s.getSubtagName()))  // 하위 태그 부분 문자열 포함 검사
+                .findFirst()
+                .orElse(null);
 
-            // 디버깅 로그
-            if (tagEntity != null) {
-                logger.info("Matched TagEntity: " + tagEntity.getTag());
-            } else {
-                logger.info("No matching TagEntity found for: " + tag);
-            }
+        // 하위 태그가 존재하면, 그 하위 태그에 연결된 상위 태그를 반환
+        if (subtagEntity != null) {
+            return subtagEntity;  // 하위 태그에 연결된 상위 태그를 반환
+        }
 
-            // 태그가 없으면 "기타" 태그로 대체로 설정해놨는데
-            //AI에 보내서 태그를 출력하도록 하기>>>>>아직!!
-            if (tagEntity == null) {
-                tagEntity = tagRepository.findByTag("기타").orElse(null);
-//                // "기타" 태그가 없으면 새로 생성
-//                if (tagEntity == null) {
-//                    tagEntity = new TagEntity();
-//                    tagEntity.setTag("기타");
-//                    tagEntity = tagRepository.save(tagEntity);
-//                }
-            }
-            questionEntity.getTags().add(tagEntity);
-            tagEntities.add(tagEntity);
-            tagEntity.getQuestions().add(questionEntity);
-            }
-            questionEntity.setTags(tagEntities);
-            QuestionEntity savedQuestion = questionRepository.save(questionEntity);
-            QuestionDTO questionDTO = QuestionMapper.INSTANCE.questionEntityToQuestionDTO(savedQuestion);
+        // 하위 태그가 없으면 null 반환
+        return null;
+    }
 
-
-
-        return String.format("Question is created: Q.ID:%s, %s, Tags: %s",
-                questionDTO.getQuestionId(),
-                questionDTO.getQuestion(),
-                String.join(", ", questionDTO.getTags()));
+    // "기타" 태그가 없으면 새로 생성하는 메서드
+    private SubtagEntity createOtherSubtag() {
+        SubtagEntity otherTag = new SubtagEntity();
+        otherTag.setSubtagName("기타");
+        return subtagRepository.save(otherTag);  // 새로 생성하여 저장
     }
 
     //전체 질문 조회

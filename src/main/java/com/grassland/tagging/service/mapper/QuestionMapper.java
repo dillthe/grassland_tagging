@@ -1,6 +1,7 @@
 package com.grassland.tagging.service.mapper;
 
 import com.grassland.tagging.repository.entity.QuestionEntity;
+import com.grassland.tagging.repository.entity.SubtagEntity;
 import com.grassland.tagging.repository.entity.TagEntity;
 import com.grassland.tagging.web.dto.QuestionBody;
 import com.grassland.tagging.web.dto.QuestionDTO;
@@ -21,14 +22,23 @@ public interface QuestionMapper {
 
     @Mapping(target="questionId", source = "questionId")
     @Mapping(target="tags", source="tags")
+    @Mapping(target="subtags", source="subtags")
     @Mapping(target = "createdAt", source = "createdAt") // createdAt을 Instant로 그대로 매핑
     QuestionDTO questionEntityToQuestionDTO(QuestionEntity questionEntity);
 
     @Mapping(target="questionId", source = "questionId")
+    @Mapping(target="subtags", source="subtags")
     @Mapping(target="categoryId", source="categoryId")
     List<QuestionDTO> questionEntitiesToQuestionDTOs(List<QuestionEntity> questionEntities);
 
     // Set<TagEntity>를 Set<String>으로 변환 (tag 이름만 추출)
     @IterableMapping(elementTargetType = String.class)
     Set<String> tagEntitiesToStrings(Set<TagEntity> tags);
+
+    @IterableMapping(elementTargetType = String.class)
+    List<String> subtagEntitiesToStrings(List<SubtagEntity> subtags);
+
+    // SubtagEntity -> String 변환 방법 명시
+    @Mapping(source = "subtagName", target = "subtagName")
+    String subtagEntityToString(SubtagEntity subtagEntity);
 }

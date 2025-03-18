@@ -1,5 +1,6 @@
 package com.grassland.tagging.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,10 @@ public class SubtagEntity {
     )
     private List<TagEntity> tags = new ArrayList<>();
 
+    @JsonBackReference
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subtags")
+    private List<QuestionEntity> questions = new ArrayList<>();
+
     @Override
     public String toString() {
         return "SubtagEntity{" +
@@ -40,4 +45,6 @@ public class SubtagEntity {
                 ", subtagName='" + subtagName + '\'' +
                 '}';
     }
+
+
 }

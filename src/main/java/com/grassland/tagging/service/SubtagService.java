@@ -43,7 +43,6 @@ public class SubtagService {
             log.info("Existing subtagEntity found: {},{}", subtagEntity.getSubtagId(), subtagEntity.getSubtagName());
         } else {
             subtagEntity = SubtagMapper.INSTANCE.idAndSubtagBodyToSubtagEntity(null, subtagBody);
-            log.info("Created new subtagEntity: {},{}", subtagEntity.getSubtagId(), subtagEntity.getSubtagName());
             try {
                 subtagEntity = subtagRepository.save(subtagEntity);
                 log.info("Saved new subtagEntity: {},{}", subtagEntity.getSubtagId(), subtagEntity.getSubtagName());
@@ -87,7 +86,6 @@ public class SubtagService {
                 log.info("Existing subtagEntity found: {},{}", subtagEntity.getSubtagId(), subtagEntity.getSubtagName());
             } else {
                 subtagEntity = SubtagMapper.INSTANCE.idAndSubtagBodyToSubtagEntity(null, subtagBody);
-                log.info("Created new subtagEntity: {},{}", subtagEntity.getSubtagId(), subtagEntity.getSubtagName());
                 try {
                     subtagEntity = subtagRepository.save(subtagEntity);
                     log.info("Saved new subtagEntity: {},{}", subtagEntity.getSubtagId(), subtagEntity.getSubtagName());

@@ -30,6 +30,7 @@ public class SubtagController {
     public String createSubtags(@PathVariable int tagId, @RequestBody List<SubtagBody> subtagBodies) {
         List<SubtagDTO> subtagDTOs = subtagService.createSubtags(tagId, subtagBodies);
         return "Subtags are added successfully!" + subtagDTOs;
+        //batch로 저장했을 때 마지막 저장된 subtagEntity만 출력되는 오류가 있음. //저장은 잘 됨
     }
 
 
