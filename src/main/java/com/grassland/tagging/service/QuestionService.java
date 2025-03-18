@@ -2,8 +2,10 @@ package com.grassland.tagging.service;
 
 
 import com.grassland.tagging.repository.QuestionRepository;
+import com.grassland.tagging.repository.SubtagRepository;
 import com.grassland.tagging.repository.TagRepository;
 import com.grassland.tagging.repository.entity.QuestionEntity;
+import com.grassland.tagging.repository.entity.SubtagEntity;
 import com.grassland.tagging.repository.entity.TagEntity;
 import com.grassland.tagging.service.exceptions.NotAcceptException;
 import com.grassland.tagging.service.exceptions.NotFoundException;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +33,7 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final TagRepository tagRepository;
-    private final TagService tagService;
+    private final SubtagRepository subtagRepository;
     private final OpenKoreanTextService oktService;
     private static final Logger logger = LoggerFactory.getLogger(QuestionService.class);
 
@@ -39,31 +42,44 @@ public class QuestionService {
     public String createQuestion(QuestionBody questionBody) {
         QuestionEntity questionEntity = QuestionMapper.INSTANCE.idAndQuestionBodyToQuestionEntity(null, questionBody);
 
+        //토큰화 하기
         List<String> tagList = oktService.tokenizeText(questionBody);
+        //구문 추출
 //        Set<String> tagList = oktService.extractPhrases(questionBody);
+        //명사 추출
 //        Set<String> tagList = oktService.extractNouns(questionBody);
-        //토큰화를 해서
+
         Set<TagEntity> tagEntities = new HashSet<>();
+        List<SubtagEntity> subtagEntities = new ArrayList<>();
 
-//        List<TagEntity> allTags = tagRepository.findAll(); // 모든 태그 가져오기
-//        Set<String> validTags = allTags.stream()
-//                .flatMap(tag -> Stream.concat(Stream.of(tag.getTag())
-////                      ,  tag.getSubTags().stream().map(SubTagEntity::getSubTag)))
-//                .collect(Collectors.toSet());
-
-        // 1. 모든 상위 태그를 가져와 Set으로 변환
+        //모든 상위 태그를 가져와 Set으로 변환
         Set<String> validTags = tagRepository.findAll()
                 .stream()
                 .map(TagEntity::getTag) // 상위 태그 이름만 추출
                 .collect(Collectors.toSet());
 
-// 2. 토큰화된 태그 목록을 필터링하여 유효한 태그만 선택
-        List<String> matchedTags = tagList.stream()
-                .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim())
-                .filter(tag->validTags.stream().anyMatch(validTag -> tag.contains(validTag)))
+        //모든 하위태그를 가져와서 List로 변환
+        List<String> validSubtags = subtagRepository.findAll()
+                .stream()
+                .map(SubtagEntity::getSubtagName) //하위 태그 이름만 추출
                 .collect(Collectors.toList());
-        // 디버깅 로그 추가
+
+
+        //토큰화 된 태그 목록을 필터링하여 유효한 태그만 선택
+//        List<String> matchedTags = tagList.stream()
+//                .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim())
+//                .filter(tag->validTags.stream().anyMatch(validTag -> tag.contains(validTag)))
+//                .collect(Collectors.toList());
+
+        //상위태그와 하위태그가 모두 포함된 태그를 필터링해서 matchedTag 생성
+        List<String> matchedTags = tagList.stream()
+                .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim()) // null이나 공백 제거
+                .filter(tag -> validTags.stream().anyMatch(validTag -> tag.contains(validTag))  // 상위 태그 체크
+                        || validSubtags.stream().anyMatch(validSubtag -> tag.contains(validSubtag)))  // 하위 태그 체크
+                .collect(Collectors.toList());
         logger.info("Matched tags: " + matchedTags);
+
+
 
         for(String tag:matchedTags){
             TagEntity tagEntity = tagRepository.findAll()
@@ -91,8 +107,8 @@ public class QuestionService {
 //                }
             }
             questionEntity.getTags().add(tagEntity);
-                tagEntities.add(tagEntity);
-                tagEntity.getQuestions().add(questionEntity);
+            tagEntities.add(tagEntity);
+            tagEntity.getQuestions().add(questionEntity);
             }
             questionEntity.setTags(tagEntities);
             QuestionEntity savedQuestion = questionRepository.save(questionEntity);
@@ -105,15 +121,6 @@ public class QuestionService {
                 questionDTO.getQuestion(),
                 String.join(", ", questionDTO.getTags()));
     }
-
-//만약에 태그가 없을 경우 새태그를 만들 수 있는 코드, 이 단계가 필요없는 태그를 저장할 수도 있기에 필요할지 한번 더 생각해보기
-//            if (tagEntity == null) {
-//                tagEntity = new TagEntity();
-//                tagEntity.setTag(trimmedTag);
-//                tagRepository.save(tagEntity);  // 새로운 태그 저장
-//            }
-//            questionEntity.getTags().add(tagEntity);
-//ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
     //전체 질문 조회
     public List<QuestionDTO> getAllQuestions() {

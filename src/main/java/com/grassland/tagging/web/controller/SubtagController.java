@@ -17,18 +17,27 @@ public class SubtagController {
 
     private final SubtagService subtagService;
 
-    @Operation(summary="Add a Subtag to Tag")
+    @Operation(summary="Add a subtag to tag")
     @PostMapping("/tag/{tagId}/subtag")
     public String createSubtag(@PathVariable int tagId, @RequestBody SubtagBody subtagBody) {
         SubtagDTO subtagDTO = subtagService.createSubtag(tagId, subtagBody);
         return subtagDTO + "is successfully added!";
     }
 
-    //서브태그가 포함된 전체 태그 조회
+
+    @Operation(summary="Add multiple subtags")
+    @PostMapping("/tag/{tagId}/subtag/batch")
+    public String createSubtags(@PathVariable int tagId, @RequestBody List<SubtagBody> subtagBodies) {
+        List<SubtagDTO> subtagDTOs = subtagService.createSubtags(tagId, subtagBodies);
+        return "Subtags are added successfully!" + subtagDTOs;
+    }
+
+
+    //서브태그로 상위 태그 조회
     //상위태그-하위태그 다대다 관계로 동일한 하위태그가 여러 상위태그에 포함될 수 있음.
     //하위태그와 이게 포함된 상위태그가 함께 출력되어 한눈에 중복된 데이터를 조회 가능
-    // 아래 delete a subtag by subtag 메소드 사용하면 삭제 가능
-    @Operation(summary="Find subtags and their Tags(find duplicate subtags")
+    //아래 delete a subtag by subtag 메소드 사용하면 원하는 정보 손쉽게 삭제 가능
+    @Operation(summary="Get all tags associated with a subtag")
     @GetMapping("/subtag/find")
     public String findSubtag(@RequestBody SubtagBody subtagBody) {
         return subtagService.findSubtag(subtagBody);
@@ -41,31 +50,19 @@ public class SubtagController {
     }
 
 
-    @Operation(summary="Get All Subtags by a TagID")
+    @Operation(summary="Get all subtags by a tagId")
     @GetMapping("/tag/{tagId}/subtag")
-    public List<SubtagDTO> getSubtagsByTagId(@PathVariable int tagId) {
-        return  subtagService.getSubtagsByTagId(tagId);
+    public String getSubtagsByTagId(@PathVariable int tagId) {
+        String subtagDTOs = subtagService.getSubtagsByTagId(tagId);
+        return subtagDTOs;
     }
 
-
-
-    @Operation(summary="Add many subtags")
-    @PostMapping("/tag/{tagId}/subtag/batch")
-    public String createSubtags(@PathVariable int tagId, @RequestBody List<SubtagBody> subtagBodies) {
-        List<SubtagDTO> subtagDTOs = subtagService.createSubtags(tagId, subtagBodies);
-        return "Subtags are added successfully!" + subtagDTOs.toString();
+    @Operation(summary="Delete a subtag by subtag name")
+    @DeleteMapping("/subtag")
+    public String deleteSubtag(@RequestBody SubtagBody subtagBody) {
+        return subtagService.deleteSubtag(subtagBody);
     }
 
-
-
-    // 하위태그 명으로 삭제
-    @Operation(summary="Delete a Subtag by Subtag Id")
-    @DeleteMapping("/subtag/{subtagId}")
-    public String deleteSubtag(@PathVariable int subtagId, @RequestBody SubtagBody subtagBody) {
-        return subtagService.deleteSubtag(subtagId, subtagBody);
-    }
-
-    //하위태그 Id로 삭제
     @Operation(summary="Delete a subtag by tagId")
     @DeleteMapping("/{tagId}/{subtagId}")
     public String deleteSubtag(@PathVariable int tagId, @PathVariable int subtagId) {
@@ -73,11 +70,11 @@ public class SubtagController {
         return deletion;
     }
 
-    //상위태그 내 전체 하위 태그 삭제
-    @Operation(summary="Delete all subtags by Tag")
-    @DeleteMapping("/all/{tagId}")
-    public String deleteSubtag(@PathVariable int tagId) {
-        String deletion = subtagService.deleteAllSubtagsByTagId(tagId);
+
+    @Operation(summary="Delete all subtags ")
+    @DeleteMapping("/subtag/all")
+    public String deleteSubtag() {
+        String deletion = subtagService.deleteAllSubtags();
         return deletion;
     }
 

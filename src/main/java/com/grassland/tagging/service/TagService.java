@@ -3,11 +3,14 @@ package com.grassland.tagging.service;
 import com.grassland.tagging.repository.QuestionRepository;
 import com.grassland.tagging.repository.TagRepository;
 import com.grassland.tagging.repository.entity.QuestionEntity;
+import com.grassland.tagging.repository.entity.SubtagEntity;
 import com.grassland.tagging.repository.entity.TagEntity;
 import com.grassland.tagging.service.exceptions.NotAcceptException;
 import com.grassland.tagging.service.mapper.TagMapper;
 import com.grassland.tagging.web.dto.TagBody;
 import com.grassland.tagging.web.dto.TagDTO;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -83,7 +86,7 @@ public class TagService {
     public String getQuestionsByTagId(int tagId) {
         Optional<TagEntity> tag = tagRepository.findById(tagId);
         if (tag.isPresent()) {
-            Set<QuestionEntity> questions = tag.get().getQuestions();
+            List<QuestionEntity> questions = tag.get().getQuestions();
             // 질문 목록을 쉼표로 구분하여 반환
             return "Tag: " + tag.get().getTag() +"\n"+
                     "Questions related to this tag: \n" + questions
@@ -105,6 +108,14 @@ public class TagService {
 
         return "Tags: " + getTagNames(tagDTOs);
     }
+
+    public List<TagDTO> getAllTagsAndSubtags() {
+        List<TagEntity> tagEntities = tagRepository.findAll();
+        List<TagDTO> tagDTOs = TagMapper.INSTANCE.tagEntitiesToTagDTOs(tagEntities);
+        return tagDTOs;
+    }
+
+
     private String getTagNames(List<TagDTO> tagDTOList) {
         return tagDTOList.stream()
                 .map(tagDTO -> "Id:"+tagDTO.getTagId() +"-"+tagDTO.getTag() + "(" + tagDTO.getQuestionCount() + "questions) ")
@@ -120,4 +131,6 @@ public class TagService {
         tagRepository.deleteAll();
         return "All tags are deleted.";
     }
+
+
 }

@@ -16,6 +16,7 @@ public interface SubtagMapper {
     SubtagEntity idAndSubtagBodyToSubtagEntity(Integer id, SubtagBody subtagBody);
 
     SubtagDTO subtagEntityToSubtagDTO(SubtagEntity subtagEntity);
+
     List<SubtagDTO> subtagEntitiesToSubtagDTOs(List<SubtagEntity> subtagEntities);
 
 

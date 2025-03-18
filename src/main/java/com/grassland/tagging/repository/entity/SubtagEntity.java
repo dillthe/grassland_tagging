@@ -3,7 +3,9 @@ package com.grassland.tagging.repository.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -29,7 +31,7 @@ public class SubtagEntity {
             joinColumns = @JoinColumn(name = "subtag_id"), // 서브태그 외래키
             inverseJoinColumns = @JoinColumn(name = "tag_id") // 태그 외래키
     )
-    private Set<TagEntity> tags = new HashSet<>();
+    private List<TagEntity> tags = new ArrayList<>();
 
     @Override
     public String toString() {

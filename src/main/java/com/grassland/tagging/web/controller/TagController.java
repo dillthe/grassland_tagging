@@ -2,6 +2,7 @@ package com.grassland.tagging.web.controller;
 
 import com.grassland.tagging.service.TagService;
 import com.grassland.tagging.web.dto.TagBody;
+import com.grassland.tagging.web.dto.TagDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -31,13 +32,13 @@ public class TagController {
     }
 
     // 태그 조회 (질문에 포함된 태그들 조회)
-    @Operation(summary = "Get Tags by Question ID")
+    @Operation(summary = "Get tags by question Id")
     @GetMapping("/question/{questionId}")
     public String getTagsByQuestionId(@PathVariable int questionId) {
         return tagService.getTagsByQuestionId(questionId);
     }
 
-    @Operation(summary = "Get Questions by Tag Id")
+    @Operation(summary = "Get questions by tag Id")
     @GetMapping("/{tagId}")
     public String getQuestionsByTagId(@PathVariable int tagId) {
         return tagService.getQuestionsByTagId(tagId);
@@ -49,7 +50,14 @@ public class TagController {
         return tagService.getAllTags();
     }
 
-    @Operation(summary = "Delete Tag By Id")
+    @Operation(summary = "Get all tags and subtags")
+    @GetMapping("/subtags")
+    public List<TagDTO> getAllTagsAndSubtags() {
+        return tagService.getAllTagsAndSubtags();
+    }
+
+
+    @Operation(summary = "Delete tag By Id")
     @DeleteMapping("/{tagId}")
     public String deleteTagById(@PathVariable int tagId) {
         return tagService.deleteTagById(tagId);
