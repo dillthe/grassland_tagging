@@ -27,11 +27,12 @@ public class TagEntity {
     @Column(name = "tag_name", nullable = false)
     private String tag;
 
+    @JsonBackReference
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<SubtagEntity> subtagEntities = new ArrayList<>();
 
     @JsonBackReference  // 순환 참조 방지
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")  // mappedBy로 관계 주도
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)  // mappedBy로 관계 주도
     private List<QuestionEntity> questions = new ArrayList<>();
     @Override
     public String toString() {

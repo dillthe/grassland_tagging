@@ -35,10 +35,10 @@ public interface QuestionMapper {
     @IterableMapping(elementTargetType = String.class)
     Set<String> tagEntitiesToStrings(Set<TagEntity> tags);
 
-    @IterableMapping(elementTargetType = String.class)
-    List<String> subtagEntitiesToStrings(List<SubtagEntity> subtags);
-
-    // SubtagEntity -> String 변환 방법 명시
-    @Mapping(source = "subtagName", target = "subtagName")
-    String subtagEntityToString(SubtagEntity subtagEntity);
+//    @IterableMapping(elementTargetType = String.class)
+//    List<String> subtagEntitiesToStrings(List<SubtagEntity> subtags);
+//
+//    // SubtagEntity -> String 변환 방법 명시
+//    @Mapping(source = "subtagName", target = "subtagName")
+//    String subtagEntityToString(SubtagEntity subtagEntity);
 }

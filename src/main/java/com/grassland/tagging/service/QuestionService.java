@@ -99,7 +99,7 @@ public class QuestionService {
                 questionDTO.getQuestionId(),
                 questionDTO.getQuestion(),
                 questionDTO.getTags(),
-                questionDTO.getSubtag(),
+                questionDTO.getSubtags(),
                 String.join(", "));
     }
 
@@ -198,15 +198,15 @@ public class QuestionService {
         return questionDTO;
     }
 
-//    public QuestionDTO getQuestionById(int questionId, String userTimeZone) {
-//        QuestionEntity existingQuestion = questionRepository.findById(questionId)
-//                .orElseThrow(() -> new NotAcceptException("Question Id doesn't exist"));
-//        QuestionDTO questionDTO = QuestionMapper.INSTANCE.questionEntityToQuestionDTO(existingQuestion);
-//        //질문을 저장할 때는 UTC타임으로 저장이 되지만, 질문을 조회할 때는 사용자 위치에 맞게 시간대가 변환되어 조회됨.
-//        String formattedTime = TimeZoneConverter.convertToUserTimeZone(existingQuestion.getCreatedAt(), userTimeZone);
-//        questionDTO.setCreatedAt(formattedTime);
-//        return questionDTO;
-//    }
+    public QuestionDTO getQuestionById(int questionId, String userTimeZone) {
+        QuestionEntity existingQuestion = questionRepository.findById(questionId)
+                .orElseThrow(() -> new NotAcceptException("Question Id doesn't exist"));
+        QuestionDTO questionDTO = QuestionMapper.INSTANCE.questionEntityToQuestionDTO(existingQuestion);
+        //질문을 저장할 때는 UTC타임으로 저장이 되지만, 질문을 조회할 때는 사용자 위치에 맞게 시간대가 변환되어 조회됨.
+        String formattedTime = TimeZoneConverter.convertToUserTimeZone(existingQuestion.getCreatedAt(), userTimeZone);
+        questionDTO.setCreatedAt(formattedTime);
+        return questionDTO;
+    }
 
 
     public String deleteQuestion(int questionId) {

@@ -1,12 +1,19 @@
 package com.grassland.tagging.service;
 
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
-@Service
-@RequiredArgsConstructor
-@Slf4j
 public class TimeZoneConverter {
+    public static String convertToUserTimeZone(Instant utcTime, String userTimeZone) {
+        if (utcTime == null || userTimeZone == null) return null;
+
+        ZoneId zoneId = ZoneId.of(userTimeZone);
+        ZonedDateTime userTime = utcTime.atZone(zoneId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+
+        return userTime.format(formatter);
+    }
 }

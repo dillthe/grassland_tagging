@@ -19,8 +19,7 @@ public class QuestionController {
     @Operation(summary = "Create a question")
     @PostMapping
     public String createQuestion(@RequestBody QuestionBody questionBody) {
-        String createdQuestion = questionService.createQuestion(questionBody);
-        return createdQuestion;
+        return questionService.createQuestion(questionBody);
     }
 
 //    @Operation(summary = "Create many questions")
@@ -36,31 +35,26 @@ public class QuestionController {
         return questionService.getAllQuestions();
     }
 
-    @Operation(summary = "Get one question by Id")
+
+    @Operation(summary = "Get one question by Id (with optional user timezone)")
     @GetMapping("/{questionId}")
-    public QuestionDTO getQuestion(@PathVariable int questionId) {
-        QuestionDTO questionDTO = questionService.getQuestionById(questionId);
-        return questionDTO;
+    public QuestionDTO getQuestion(@PathVariable int questionId,
+                                   @RequestParam(required = false) String userTimeZone) {
+        if (userTimeZone != null) {
+            return questionService.getQuestionById(questionId, userTimeZone);
+        }
+        return questionService.getQuestionById(questionId);
     }
-//
-//    @Operation(summary = "Get one question by Id + 사용자 시간대 맞춰 조회 가능하도록 함")
-//    @GetMapping("/{questionId}")
-//    public QuestionDTO getQuestion(@PathVariable int questionId, @RequestParam String userTimeZone ) {
-//        QuestionDTO questionDTO = questionService.getQuestionById(questionId, userTimeZone);
-//        return questionDTO;
-//    }
 
     @Operation(summary = "Delete a question")
     @DeleteMapping("/{questionId}")
     public String deleteQuestion(@PathVariable int questionId) {
-        String deletion = questionService.deleteQuestion(questionId);
-        return deletion;
+        return questionService.deleteQuestion(questionId);
     }
 
     @Operation(summary = "Delete a question")
     @DeleteMapping()
     public String deleteAllQuestion() {
-        String deletion = questionService.deleteAllQuestion();
-        return deletion;
+        return questionService.deleteAllQuestion();
     }
 }
