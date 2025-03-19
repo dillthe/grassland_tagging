@@ -12,6 +12,7 @@ import java.util.List;
 @Mapper
 public interface SubtagMapper {
     SubtagMapper INSTANCE = Mappers.getMapper(SubtagMapper.class);
+
     @Mapping(target = "subtagName", source = "subtagBody.subtagName")
     SubtagEntity idAndSubtagBodyToSubtagEntity(Integer id, SubtagBody subtagBody);
 

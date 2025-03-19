@@ -1,4 +1,5 @@
 package com.grassland.tagging.service;
+
 import com.grassland.tagging.web.dto.QuestionBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +13,11 @@ import org.springframework.stereotype.Service;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +37,8 @@ public class OpenKoreanTextService {
     }
 
 
-
     // 필터링할 단어 리스트 (명사추출, 구문추출 시 사용)
-    List<String> filterWords = Arrays.asList("대한", "지금", "아니면", "이제", "거", "내", "로만", "것", "이런", "저런", "어떤", "종종", "과연", "나", "오늘", "그" );
+    List<String> filterWords = Arrays.asList("대한", "지금", "아니면", "이제", "거", "내", "로만", "것", "이런", "저런", "어떤", "종종", "과연", "나", "오늘", "그");
 
 
     //명사추출
@@ -87,7 +89,7 @@ public class OpenKoreanTextService {
                 .filter(token -> token.pos().equals(KoreanPos.Noun()))  // 명사(Noun)만 필터링
                 .map(KoreanTokenizer.KoreanToken::text)
                 .collect(Collectors.toSet());  // 중복 제거
-        log.info("filteredNoun"+filteredNouns);
+        log.info("filteredNoun" + filteredNouns);
         //'술'관련 질문에서 '술' '죄' 뭐 이런 한글자 단어가 filteredPhrases로 반환되지 않는 문제때문에 non+phrases를 합쳐 만든 코드인데,
         //[ "취업","나","안","왜" 이런식으로 나옴. 만약 병합 안하면 그냥 "취업"만 나옴.
         //태그 코드를 더 구체화 한 다음 다시 수정해봐야 될 것 같음.

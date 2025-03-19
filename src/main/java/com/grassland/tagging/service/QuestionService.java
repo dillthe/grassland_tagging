@@ -190,7 +190,7 @@ public class QuestionService {
         return questionDTOs;
     }
 
-//    질문 단건 조회
+    //    질문 단건 조회
     public QuestionDTO getQuestionById(int questionId) {
         QuestionEntity existingQuestion = questionRepository.findById(questionId)
                 .orElseThrow(() -> new NotAcceptException("Question Id doesn't exist"));

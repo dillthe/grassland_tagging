@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFoundException (NotFoundException
-    ex, HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> handleNotFoundException(NotFoundException
+                                                                               ex, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.NOT_FOUND.value());
@@ -37,8 +37,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidValueException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidValueException (InvalidValueException
-                                                                                ex, HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> handleInvalidValueException(InvalidValueException
+                                                                                   ex, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.BAD_REQUEST.value());
@@ -49,8 +49,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<Map<String, Object>> handleConflictException (ConflictException
-                                                                                    ex, HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> handleConflictException(ConflictException
+                                                                               ex, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.CONFLICT.value());

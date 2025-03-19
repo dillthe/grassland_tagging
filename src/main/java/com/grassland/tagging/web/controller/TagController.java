@@ -17,16 +17,16 @@ public class TagController {
     private final TagService tagService;
 
     //태그 등록
-    @Operation(summary="Create a new tag")
+    @Operation(summary = "Create a new tag")
     @PostMapping
-    public String createTag(@RequestBody TagBody tagBody){
+    public String createTag(@RequestBody TagBody tagBody) {
         String tag = tagService.createTag(tagBody);
         return "New tag: [" + tag + "] is created";
     }
 
-    @Operation(summary="Create many tags")
+    @Operation(summary = "Create many tags")
     @PostMapping("/batch")
-    public String createTags(@RequestBody List<TagBody> tagBodies){
+    public String createTags(@RequestBody List<TagBody> tagBodies) {
         List<String> tagList = tagService.createTags(tagBodies);
         return "Tags are successfully added" + tagList;
     }

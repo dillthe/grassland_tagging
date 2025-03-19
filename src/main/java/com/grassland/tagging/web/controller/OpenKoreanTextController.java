@@ -1,11 +1,13 @@
 package com.grassland.tagging.web.controller;
+
 import com.grassland.tagging.service.OpenKoreanTextService;
 import com.grassland.tagging.web.dto.QuestionBody;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.patterns.TypePatternQuestions;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 

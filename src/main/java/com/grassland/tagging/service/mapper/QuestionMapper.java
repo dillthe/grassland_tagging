@@ -12,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Set;
+
 @Mapper(uses = TagMapper.class)
 public interface QuestionMapper {
     QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);
@@ -20,15 +21,16 @@ public interface QuestionMapper {
     @Mapping(target = "createdAt", expression = "java(java.time.Instant.now())")
     QuestionEntity idAndQuestionBodyToQuestionEntity(Integer id, QuestionBody questionBody);
 
-    @Mapping(target="questionId", source = "questionId")
-    @Mapping(target="tags", source="tags")
-    @Mapping(target="subtags", source="subtags")
-    @Mapping(target = "createdAt", source = "createdAt") // createdAt을 Instant로 그대로 매핑
+    @Mapping(target = "questionId", source = "questionId")
+    @Mapping(target = "tags", source = "tags")
+    @Mapping(target = "subtags", source = "subtags")
+    @Mapping(target = "createdAt", source = "createdAt")
+        // createdAt을 Instant로 그대로 매핑
     QuestionDTO questionEntityToQuestionDTO(QuestionEntity questionEntity);
 
-    @Mapping(target="questionId", source = "questionId")
-    @Mapping(target="subtags", source="subtags")
-    @Mapping(target="categoryId", source="categoryId")
+    @Mapping(target = "questionId", source = "questionId")
+    @Mapping(target = "subtags", source = "subtags")
+    @Mapping(target = "categoryId", source = "categoryId")
     List<QuestionDTO> questionEntitiesToQuestionDTOs(List<QuestionEntity> questionEntities);
 
     // Set<TagEntity>를 Set<String>으로 변환 (tag 이름만 추출)

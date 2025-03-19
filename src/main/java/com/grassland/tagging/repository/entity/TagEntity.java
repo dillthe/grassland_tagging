@@ -1,15 +1,15 @@
 package com.grassland.tagging.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -34,6 +34,7 @@ public class TagEntity {
     @JsonBackReference
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<QuestionEntity> questions = new ArrayList<>();
+
     @Override
     public String toString() {
         return "TagEntity{" +
