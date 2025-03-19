@@ -62,6 +62,9 @@ public class QuestionService {
                 .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim())
                 .filter(tag -> validSubtags.stream().anyMatch(validSubtag -> tag.contains(validSubtag)))  // 하위 태그 체크
                 .collect(Collectors.toList());
+        if (matchedTags.isEmpty()) {
+            matchedTags.add("기타");
+        }
         logger.info("Matched tags: " + matchedTags);
 
         // 2. matchedTags를 돌면서 해당하는 TagEntity를 추가
@@ -102,63 +105,6 @@ public class QuestionService {
                 questionDTO.getSubtags(),
                 String.join(", "));
     }
-
-
-//        //모든 상위 태그를 가져와 Set으로 변환
-//        Set<String> validTags = tagRepository.findAll()
-//                .stream()
-//                .map(TagEntity::getTag) // 상위 태그 이름만 추출
-//                .collect(Collectors.toSet());
-
-
-    //토큰화 된 태그 목록을 필터링하여 유효한 태그만 선택
-//        List<String> matchedTags = tagList.stream()
-//                .map(tag -> (tag == null || tag.trim().isEmpty()) ? "기타" : tag.trim())
-//                .filter(tag->validTags.stream().anyMatch(validTag -> tag.contains(validTag)))
-//                .collect(Collectors.toList());
-
-
-//        for(String tag:matchedTags){
-//            TagEntity tagEntity = tagRepository.findAll()
-//                    .stream()
-//                    .filter(t -> tag.contains(t.getTag())) // 부분 문자열 포함 검사
-//                    .findFirst()
-//                    .orElse(null);
-
-//            // 디버깅 로그
-//            if (tagEntity != null) {
-//                logger.info("Matched TagEntity: " + tagEntity.getTag());
-//            } else {
-//                logger.info("No matching TagEntity found for: " + tag);
-//            }
-//
-//            // 태그가 없으면 "기타" 태그로 대체로 설정해놨는데
-//            //AI에 보내서 태그를 출력하도록 하기>>>>>아직!!
-//            if (tagEntity == null) {
-//                tagEntity = tagRepository.findByTag("기타").orElse(null);
-////                // "기타" 태그가 없으면 새로 생성
-////                if (tagEntity == null) {
-////                    tagEntity = new TagEntity();
-////                    tagEntity.setTag("기타");
-////                    tagEntity = tagRepository.save(tagEntity);
-////                }
-//            }
-//            questionEntity.getTags().add(tagEntity);
-//            tagEntities.add(tagEntity);
-//            tagEntity.getQuestions().add(questionEntity);
-//            }
-//            questionEntity.setTags(tagEntities);
-//            QuestionEntity savedQuestion = questionRepository.save(questionEntity);
-//            QuestionDTO questionDTO = QuestionMapper.INSTANCE.questionEntityToQuestionDTO(savedQuestion);
-//
-//
-//
-//        return String.format("Question is created: Q.ID:%s, %s, Tags: %s",
-//                questionDTO.getQuestionId(),
-//                questionDTO.getQuestion(),
-//                String.join(", ", questionDTO.getTags()));
-//    }
-
     private SubtagEntity findSubtagEntity(String text) {
         // 하위 태그에서 찾기
         SubtagEntity subtagEntity = subtagRepository.findAll()

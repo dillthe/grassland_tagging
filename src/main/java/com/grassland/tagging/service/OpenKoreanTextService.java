@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,20 +73,22 @@ public class OpenKoreanTextService {
         Set<KoreanPhraseExtractor.KoreanPhrase> phrases = new HashSet<>(OpenKoreanTextProcessorJava.extractPhrases(tokens, true, true));
         log.info("tokens:" + tokens);
         log.info("phrases:" + phrases);
+        return Collections.singleton(String.valueOf(phrases));
 
         // 필터링 후 중복 제거
-        Set<String> filteredPhrases = phrases.stream()
-                .map(KoreanPhraseExtractor.KoreanPhrase::text)
-                .filter(phrase -> filterWords.stream().noneMatch(phrase::contains)) // 필터리스트의 단어가 포함되지 않은 경우만
-                .collect(Collectors.toSet());  // 중복을 제거하기 위해 Set 사용
-        log.info("filteredPhrases" + filteredPhrases);
-        // 중복된 구문을 필터링한 뒤, 결과를 리스트로 반환
-
-        Set<String> filteredNouns = JavaConverters.seqAsJavaList(tokens).stream()
-                .filter(token -> token.pos().equals(KoreanPos.Noun()))  // 명사(Noun)만 필터링
-                .map(KoreanTokenizer.KoreanToken::text)
-                .collect(Collectors.toSet());  // 중복 제거
-        log.info("filteredNoun" + filteredNouns);
+//        Set<String> filteredPhrases = phrases.stream()
+//                .map(KoreanPhraseExtractor.KoreanPhrase::text)
+//                .filter(phrase -> filterWords.stream().noneMatch(phrase::contains)) // 필터리스트의 단어가 포함되지 않은 경우만
+//                .collect(Collectors.toSet());  // 중복을 제거하기 위해 Set 사용
+//        log.info("filteredPhrases" + filteredPhrases);
+//        return filteredPhrases;
+//        // 중복된 구문을 필터링한 뒤, 결과를 리스트로 반환
+//
+//        Set<String> filteredNouns = JavaConverters.seqAsJavaList(tokens).stream()
+//                .filter(token -> token.pos().equals(KoreanPos.Noun()))  // 명사(Noun)만 필터링
+//                .map(KoreanTokenizer.KoreanToken::text)
+//                .collect(Collectors.toSet());  // 중복 제거
+//        log.info("filteredNoun" + filteredNouns);
         //'술'관련 질문에서 '술' '죄' 뭐 이런 한글자 단어가 filteredPhrases로 반환되지 않는 문제때문에 non+phrases를 합쳐 만든 코드인데,
         //[ "취업","나","안","왜" 이런식으로 나옴. 만약 병합 안하면 그냥 "취업"만 나옴.
         //태그 코드를 더 구체화 한 다음 다시 수정해봐야 될 것 같음.
@@ -101,14 +100,14 @@ public class OpenKoreanTextService {
 //        log.info("combinedFiltered: " + combinedFiltered);
 
 
-        Set<String> result = new HashSet<>(filteredPhrases);
-        log.info("result" + result);
-        // 짧은 구문이 긴 구문에 포함되는 경우 긴 구문만 남기도록 필터링
-        Set<String> finalResult = result;
-        result = result.stream()
-                .filter(phrase -> finalResult.stream().noneMatch(other -> other.contains(phrase) && !other.equals(phrase)))
-                .collect(Collectors.toSet());
+//        Set<String> result = new HashSet<>(filteredPhrases);
+//        log.info("result" + result);
+//        // 짧은 구문이 긴 구문에 포함되는 경우 긴 구문만 남기도록 필터링
+//        Set<String> finalResult = result;
+//        result = result.stream()
+//                .filter(phrase -> finalResult.stream().noneMatch(other -> other.contains(phrase) && !other.equals(phrase)))
+//                .collect(Collectors.toSet());
 
-        return result;
+//        return result;
     }
 }
