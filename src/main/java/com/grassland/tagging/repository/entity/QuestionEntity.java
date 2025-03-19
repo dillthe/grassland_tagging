@@ -45,9 +45,9 @@ public class QuestionEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "question_subtag",  // 중간 테이블 이름
-            joinColumns = @JoinColumn(name = "question_id"),  // QuestionEntity에서 참조하는 컬럼
-            inverseJoinColumns = @JoinColumn(name = "subtag_id")  // TagEntity에서 참조하는 컬럼
+            name = "question_subtag",
+            joinColumns = @JoinColumn(name = "question_id"),
+            inverseJoinColumns = @JoinColumn(name = "subtag_id")
     )
     private List<SubtagEntity> subtags = new ArrayList<>();
 }

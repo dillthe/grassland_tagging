@@ -31,8 +31,8 @@ public class TagEntity {
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<SubtagEntity> subtagEntities = new ArrayList<>();
 
-    @JsonBackReference  // 순환 참조 방지
-    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)  // mappedBy로 관계 주도
+    @JsonBackReference
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<QuestionEntity> questions = new ArrayList<>();
     @Override
     public String toString() {
