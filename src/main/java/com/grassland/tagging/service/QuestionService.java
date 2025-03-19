@@ -38,7 +38,7 @@ public class QuestionService {
 
 
     @Transactional
-    public String createQuestion(QuestionBody questionBody) {
+    public QuestionDTO createQuestion(QuestionBody questionBody) {
         QuestionEntity questionEntity = QuestionMapper.INSTANCE.idAndQuestionBodyToQuestionEntity(null, questionBody);
 
         //토큰화 하기
@@ -73,9 +73,9 @@ public class QuestionService {
 
             // 디버깅 로그
             if (subtagEntity != null) {
-                logger.info("Matched TagEntity: " + subtagEntity.getTags());
+                logger.debug("Matched TagEntity: " + subtagEntity.getTags());
             } else {
-                logger.info("No matching TagEntity found for: " + subtag);
+                logger.debug("No matching TagEntity found for: " + subtag);
             }
 
             // 태그가 없으면 "기타" 태그로 대체
@@ -97,13 +97,15 @@ public class QuestionService {
         QuestionEntity savedQuestion = questionRepository.save(questionEntity);
         QuestionDTO questionDTO = QuestionMapper.INSTANCE.questionEntityToQuestionDTO(savedQuestion);
 
-        // 결과 반환
-        return String.format("Question is created: Q.ID:%s, %s, Tags: %s, Subtags: %s",
-                questionDTO.getQuestionId(),
-                questionDTO.getQuestion(),
-                questionDTO.getTags(),
-                questionDTO.getSubtags(),
-                String.join(", "));
+        return questionDTO;
+        //
+//        // 결과 반환
+//        return String.format("Question is created: Q.ID:%s, %s, Tags: %s, Subtags: %s",
+//                questionDTO.getQuestionId(),
+//                questionDTO.getQuestion(),
+//                questionDTO.getTags(),
+//                questionDTO.getSubtags(),
+//                String.join(", "));
     }
     private SubtagEntity findSubtagEntity(String text) {
         // 하위 태그에서 찾기

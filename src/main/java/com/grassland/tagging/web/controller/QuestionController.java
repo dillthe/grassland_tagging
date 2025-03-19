@@ -18,7 +18,7 @@ public class QuestionController {
 
     @Operation(summary = "Create a question")
     @PostMapping
-    public String createQuestion(@RequestBody QuestionBody questionBody) {
+    public QuestionDTO createQuestion(@RequestBody QuestionBody questionBody) {
         return questionService.createQuestion(questionBody);
     }
 
